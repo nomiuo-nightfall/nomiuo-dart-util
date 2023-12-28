@@ -1,0 +1,47 @@
+name: orange_core_util_workspace
+
+packages:
+  - packages/*
+
+command:
+  version:
+    branch: main
+    workspaceChangelog: true
+
+  bootstrap:
+    environment:
+      sdk: ^3.1.1
+    dev_dependencies:
+      test: ^1.25.0
+
+scripts:
+  test:coverage:
+    description: Generate code coverage for the current project.
+    run: dart run coverage:test_with_coverage
+    exec:
+      concurrency: 1
+    packageFilters:
+      dirExists:
+        - test
+    # This tells Melos tests to ignore env variables passed to tests from
+    # `melos run test` as they could change the behaviour of how tests
+    # filter packages.
+    env:
+      MELOS_TEST: true
+
+  test:coverage:html:unixLike:
+    description: Generate code coverage for the current project and generate an HTML report.
+    run: genhtml -o coverage/html coverage/lcov.info
+    exec:
+      concurrency: 1
+    packageFilters:
+      dirExists:
+        - test
+  test:coverage:html:windows:
+    description: Generate code coverage for the current project and generate an HTML report.
+    run: perl %GENHTML% -o coverage\html coverage\lcov.info
+    exec:
+      concurrency: 1
+    packageFilters:
+      dirExists:
+        - test

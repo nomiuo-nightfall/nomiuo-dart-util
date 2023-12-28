@@ -1,0 +1,7 @@
+name: orange_isolate_worker
+
+environment:
+  sdk: ^3.1.1
+
+dev_dependencies:
+  test: ^1.25.0
