@@ -1,4 +1,4 @@
-name: orange_isolate_worker
+name: nomiuo_isolate_worker
 
 environment:
   sdk: ^3.1.1

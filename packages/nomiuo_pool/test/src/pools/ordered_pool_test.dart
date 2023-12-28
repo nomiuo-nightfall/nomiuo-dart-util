@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:nomiuo_pool/orange_pool.dart';
+import 'package:nomiuo_pool/nomiuo_pool.dart';
 import 'package:test/test.dart';
 
 class OperateFailed implements Exception {}
