@@ -31,8 +31,8 @@ abstract interface class AbstractPool<PoolResourceType extends Object> {
   ///
   /// Notice that it will not catch any exception thrown by the
   /// [PoolResource.onRelease] or [PoolResource.onReset] method, simply rethrow.
-  Future<void> operateOnResourceWithoutTimeout(
-      OperationOnResource<PoolResourceType> operationOnResource);
+  Future<void> operateOnResourceWithoutTimeout<ReturnType>(
+      OperationOnResource<PoolResourceType, ReturnType> operationOnResource);
 
   /// Like the [operateOnResourceWithoutTimeout], but with a timeout. It will
   /// wait until the resource is borrowed or the timeout is reached.
@@ -41,8 +41,8 @@ abstract interface class AbstractPool<PoolResourceType extends Object> {
   ///
   /// If the timeout is reached, then throw an exception
   /// [GetResourceFromPoolTimeout].
-  Future<void> operateOnResourceWithTimeout(
-      OperationOnResource<PoolResourceType> operationOnResource,
+  Future<void> operateOnResourceWithTimeout<ReturnType>(
+      OperationOnResource<PoolResourceType, ReturnType> operationOnResource,
       Duration timeout);
 
   /// Get the number of all resources in the pool, including free and in use.

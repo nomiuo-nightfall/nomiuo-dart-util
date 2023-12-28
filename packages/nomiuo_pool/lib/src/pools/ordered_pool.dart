@@ -33,14 +33,13 @@ class OrderedPool<PoolResourceType extends Object>
       _freeResources.length + _inUseResources.length;
 
   @override
-  Future<void> operateOnResourceWithTimeout(
-      OperationOnResource<PoolResourceType> operationOnResource,
+  Future<ReturnType> operateOnResourceWithTimeout<ReturnType>(
+      OperationOnResource<PoolResourceType, ReturnType> operationOnResource,
       Duration timeout) async {
     final DateTime startWaitTime = DateTime.now();
     while (true) {
       try {
-        await _tryHandleWithinAvailableResources(operationOnResource);
-        return;
+        return await _tryHandleWithinAvailableResources(operationOnResource);
       } on GetResourceFromPoolFailed {
         await Future<void>.delayed(_retryInterval);
       }
@@ -58,52 +57,61 @@ class OrderedPool<PoolResourceType extends Object>
   }
 
   @override
-  Future<void> operateOnResourceWithoutTimeout(
-      OperationOnResource<PoolResourceType> operationOnResource) async {
-    await _tryHandleWithinAvailableResources(operationOnResource);
-  }
+  Future<ReturnType> operateOnResourceWithoutTimeout<ReturnType>(
+          OperationOnResource<PoolResourceType, ReturnType>
+              operationOnResource) async =>
+      _tryHandleWithinAvailableResources(operationOnResource);
 
   /// Throws [GetResourceFromPoolFailed] if the pool has no resource and
   /// space left to create new resource.
   ///
   /// Throws [CreateResourceFailed] if failed to create new resource.
-  Future<void> _tryHandleWithinAvailableResources(
-      OperationOnResource<PoolResourceType> operationOnResource) async {
+  Future<ReturnType> _tryHandleWithinAvailableResources<ReturnType>(
+      OperationOnResource<PoolResourceType, ReturnType>
+          operationOnResource) async {
     try {
-      await _tryBorrowFromFreeResourceAndHandle(operationOnResource);
+      return await _tryBorrowFromFreeResourceAndHandle(operationOnResource);
     } on GetResourceFromPoolFailed {
-      await _tryCreateAndHandle(operationOnResource);
+      return _tryCreateAndHandle(operationOnResource);
     }
   }
 
-  Future<void> _tryCreateAndHandle(
-      OperationOnResource<PoolResourceType> operationOnResource) async {
+  Future<ReturnType> _tryCreateAndHandle<ReturnType>(
+      OperationOnResource<PoolResourceType, ReturnType>
+          operationOnResource) async {
     final PoolObject<PoolResourceType> poolObject =
         await _resourceLock.synchronized(() async => _createToPool());
 
+    final ReturnType result;
     try {
-      await _handle(poolObject, operationOnResource);
+      result = await _handle(poolObject, operationOnResource);
     } finally {
       await _resourceLock
           .synchronized(() => _inUseResources.remove(poolObject));
     }
 
     await _resourceLock.synchronized(() => _freeResources.add(poolObject));
+
+    return result;
   }
 
-  Future<void> _tryBorrowFromFreeResourceAndHandle(
-      OperationOnResource<PoolResourceType> operationOnResource) async {
+  Future<ReturnType> _tryBorrowFromFreeResourceAndHandle<ReturnType>(
+      OperationOnResource<PoolResourceType, ReturnType>
+          operationOnResource) async {
     final PoolObject<PoolResourceType> poolObject =
         await _resourceLock.synchronized(() async => _borrowFromFreeResource());
 
+    final ReturnType result;
     try {
-      await _handle(poolObject, operationOnResource);
+      result = await _handle(poolObject, operationOnResource);
     } finally {
       await _resourceLock
           .synchronized(() => _inUseResources.remove(poolObject));
     }
 
     await _resourceLock.synchronized(() => _freeResources.add(poolObject));
+
+    return result;
   }
 
   Future<PoolObject<PoolResourceType>> _createToPool() async {
@@ -128,16 +136,21 @@ class OrderedPool<PoolResourceType extends Object>
     throw const GetResourceFromPoolFailed('No resource available in the pool');
   }
 
-  Future<void> _handle(PoolObject<PoolResourceType> poolObject,
-      OperationOnResource<PoolResourceType> operationOnResource) async {
+  Future<ReturnType> _handle<ReturnType>(
+      PoolObject<PoolResourceType> poolObject,
+      OperationOnResource<PoolResourceType, ReturnType>
+          operationOnResource) async {
+    final ReturnType result;
     try {
-      await operationOnResource(poolObject.resource);
+      result = await operationOnResource(poolObject.resource);
     } on Object catch (error, stackTrace) {
       await poolObject.resource.onRelease(error, stackTrace);
       rethrow;
     }
 
     await poolObject.resource.onReset();
+
+    return result;
   }
 
   /// Add a new resource from the factory to the in used resources and return
