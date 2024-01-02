@@ -1,4 +1,25 @@
 name: nomiuo_pool
+version: 0.1.0
+description: |
+  Manage resource with a pool, which provides a way to execute tasks with a 
+  limited number of resources, with optional timeout, and return the 
+  resultant value of the task. After the task is executed, the resource will be
+  reset and returned to the pool.
+homepage: https://github.com/nomiuo-nightfall/nomiuo-dart-util/tree/main/packages/nomiuo_pool
+repository: https://github.com/nomiuo-nightfall/nomiuo-dart-util/tree/main/packages/nomiuo_pool
+issue_tracker: https://github.com/nomiuo-nightfall/nomiuo-dart-util/issues
+
+platforms:
+  android:
+  ios:
+  linux:
+  macos:
+  web:
+  windows:
+
+topics:
+  - pool
+  - executor
 
 environment:
   sdk: ^3.1.1

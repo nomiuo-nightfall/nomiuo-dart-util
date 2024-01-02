@@ -3,16 +3,16 @@ import 'dart:async';
 import 'package:nomiuo_pool/nomiuo_pool.dart';
 import 'package:test/test.dart';
 
-class OperateFailed implements Exception {}
+class _OperateFailed implements Exception {}
 
-class ReleaseFailed implements Exception {}
+class _ReleaseFailed implements Exception {}
 
-class PoolIntResource extends PoolResource<int> {
-  PoolIntResource(super.resource);
+class _PoolIntResource extends PoolResource<int> {
+  _PoolIntResource(super.resource);
 }
 
-class PoolIntResourceWithReset extends PoolIntResource {
-  PoolIntResourceWithReset(super.resource);
+class _PoolIntResourceWithReset extends _PoolIntResource {
+  _PoolIntResourceWithReset(super.resource);
 
   @override
   FutureOr<void> onReset() {
@@ -20,12 +20,12 @@ class PoolIntResourceWithReset extends PoolIntResource {
   }
 }
 
-class PoolIntResourceWithFailedRelease extends PoolIntResource {
-  PoolIntResourceWithFailedRelease(super.resource);
+class _PoolIntResourceWithFailedRelease extends _PoolIntResource {
+  _PoolIntResourceWithFailedRelease(super.resource);
 
   @override
   FutureOr<void> onRelease(Object error, StackTrace stackTrace) {
-    throw ReleaseFailed();
+    throw _ReleaseFailed();
   }
 }
 
@@ -33,7 +33,7 @@ void main() {
   test('Initialize the resources.', () async {
     final OrderedPool<int> simplePool = await OrderedPool.create(
         PoolMeta(minSize: 5),
-        poolObjectFactory: () => PoolIntResource(1));
+        poolObjectFactory: () => _PoolIntResource(1));
 
     expect(await simplePool.allPoolResources(), 5);
   });
@@ -42,7 +42,7 @@ void main() {
     test('Get a resource and execute.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       await simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) async {
@@ -57,7 +57,7 @@ void main() {
     test('Reset the state of the resource.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResourceWithReset(1));
+          poolObjectFactory: () => _PoolIntResourceWithReset(1));
 
       await simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) async {
@@ -72,7 +72,7 @@ void main() {
     test('Execute the task with timeout zero.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       unawaited(simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) async {
@@ -89,7 +89,7 @@ void main() {
     test('Execute the tasks in parallel.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 100, minSize: 50),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       for (int i = 0; i < 1000; i++) {
         unawaited(simplePool.operateOnResourceWithTimeout(
@@ -106,7 +106,7 @@ void main() {
     test('Wait for the resource successfully.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       unawaited(simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) async {
@@ -125,17 +125,17 @@ void main() {
     test('Release the resource.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       try {
         await simplePool
             .operateOnResourceWithoutTimeout((PoolResource<int> poolResource) {
-          throw OperateFailed();
+          throw _OperateFailed();
         });
 
         // ignore: dead_code
         fail('Operation which throws an exception works not as expected.');
-      } on OperateFailed {
+      } on _OperateFailed {
         expect(await simplePool.allPoolResources(), 0);
 
         await simplePool.operateOnResourceWithoutTimeout(
@@ -148,7 +148,7 @@ void main() {
     test('Wait for the resource failed.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       unawaited(simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) async {
@@ -172,7 +172,7 @@ void main() {
     test('Get resource from pool failed.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       unawaited(simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) async {
@@ -207,14 +207,14 @@ void main() {
     test('Failed to release the resource.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResourceWithFailedRelease(1));
+          poolObjectFactory: () => _PoolIntResourceWithFailedRelease(1));
 
       try {
         await simplePool
             .operateOnResourceWithoutTimeout((PoolResource<int> poolResource) {
-          throw OperateFailed();
+          throw _OperateFailed();
         });
-      } on ReleaseFailed {
+      } on _ReleaseFailed {
         return;
       }
 
@@ -229,7 +229,7 @@ void main() {
         if (DateTime.now().difference(startTime).inSeconds > 1) {
           throw const CreateResourceFailed('Failed to create resource.');
         }
-        return PoolIntResource(1);
+        return _PoolIntResource(1);
       });
 
       unawaited(simplePool.operateOnResourceWithoutTimeout(
@@ -255,7 +255,7 @@ void main() {
     test('Return calculated value.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
 
       final int result = await simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) => poolResource.resource * 10);
@@ -265,7 +265,7 @@ void main() {
     test('Return Future value.', () async {
       final OrderedPool<int> simplePool = await OrderedPool.create(
           PoolMeta(maxSize: 1),
-          poolObjectFactory: () => PoolIntResource(1));
+          poolObjectFactory: () => _PoolIntResource(1));
       final int i = await simplePool.operateOnResourceWithoutTimeout(
           (PoolResource<int> poolResource) => Future<int>.value(1));
       expect(1, i);

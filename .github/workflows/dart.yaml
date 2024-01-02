@@ -1,0 +1,40 @@
+name: Dart
+
+on:
+  push:
+    branches: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: 3.1.1
+
+      - name: Install dependencies
+        run: dart pub global activate melos && melos bs
+
+      - name: Verify formatting
+        run: melos run format
+
+      - name: Analyze project source
+        run: melos run analyze
+
+      - name: Run tests
+        run: melos run test:coverage
+
+      - name: Install locv
+        run: apt-get update && apt-get install lcov -y
+
+      - name: Report LCOV
+        uses: zgosalvez/github-actions-report-lcov@v4.1.2
+        with:
+          coverage-files: "**/coverage/lcov.info"
+          minimum-coverage: 90
+
+

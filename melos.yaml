@@ -15,6 +15,14 @@ command:
       test: ^1.25.0
 
 scripts:
+  format:
+    description: Format source code.
+    run: dart format --set-exit-if-changed .
+
+  analyze:
+    description: Analyze source code.
+    run: dart analyze --fatal-infos
+
   test:coverage:
     description: Generate code coverage for the current project.
     run: dart run coverage:test_with_coverage
@@ -28,7 +36,6 @@ scripts:
     # filter packages.
     env:
       MELOS_TEST: true
-
   test:coverage:html:unixLike:
     description: Generate code coverage for the current project and generate an HTML report.
     run: genhtml -o coverage/html coverage/lcov.info

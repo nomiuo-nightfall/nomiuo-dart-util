@@ -1,4 +1,6 @@
 name: nomiuo_isolate_worker
+version: 0.1.0
+publish_to: none
 
 environment:
   sdk: ^3.1.1

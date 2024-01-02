@@ -35,7 +35,8 @@ abstract interface class AbstractPool<PoolResourceType extends Object> {
       OperationOnResource<PoolResourceType, ReturnType> operationOnResource);
 
   /// Like the [operateOnResourceWithoutTimeout], but with a timeout. It will
-  /// wait until the resource is borrowed or the timeout is reached.
+  /// wait until the resource is borrowed or the timeout is reached. Note
+  /// that the zero duration timeout means wait forever.
   ///
   /// Throw [CreateResourceFailed] if failed to create a new resource.
   ///
