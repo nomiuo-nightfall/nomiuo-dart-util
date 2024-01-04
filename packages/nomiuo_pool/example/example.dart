@@ -8,7 +8,7 @@ class CustomResource extends PoolResource<int> {
 void main() async {
   // Create an ordered pool.
   // The pool size is 2 and the max size is 10.
-  final OrderedPool<int> orderedPool = await OrderedPool.create(
+  final OperationPool<int> orderedPool = await OperationPool.createOrderedPool(
       PoolMeta(minSize: 2, maxSize: 10),
       poolObjectFactory: () => CustomResource(1));
 

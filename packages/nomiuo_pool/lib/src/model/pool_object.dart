@@ -1,7 +1,7 @@
-import 'pool_resource.dart';
+part of '../pools/operation/operation_pool.dart';
 
-class PoolObject<PoolResourceType> {
-  PoolObject(this.resource);
+class _PoolObject<PoolResourceType> {
+  _PoolObject(this.resource);
 
   final PoolResource<PoolResourceType> resource;
 

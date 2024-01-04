@@ -4,10 +4,6 @@ packages:
   - packages/*
 
 command:
-  version:
-    branch: main
-    workspaceChangelog: true
-
   bootstrap:
     environment:
       sdk: ^3.1.1
