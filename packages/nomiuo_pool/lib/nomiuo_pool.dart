@@ -1,4 +1,6 @@
+// Export the exceptions need to handle.
 export 'src/model/exceptions.dart';
-export 'src/model/pool_meta.dart';
-export 'src/model/pool_resource.dart';
-export 'src/pools/operation/operation_pool.dart';
+// Export the pool models.
+export 'src/model/pool_base_model/pool_base_model.dart';
+// Export the pools.
+export 'src/pools/pool.dart';

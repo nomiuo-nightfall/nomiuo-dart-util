@@ -1,5 +1,5 @@
 # :blossom: Manage the resource with pool
-![Static Badge](https://img.shields.io/badge/coverage-100%25-green?logo=TestCafe)
+![Static Badge](https://img.shields.io/badge/coverage-90%25-green?logo=TestCafe)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
 [![melos](https://img.shields.io/badge/maintained%20with-melos-f700ff.svg?style=flat-square)](https://github.com/invertase/melos)
 # :carousel_horse: Usage
