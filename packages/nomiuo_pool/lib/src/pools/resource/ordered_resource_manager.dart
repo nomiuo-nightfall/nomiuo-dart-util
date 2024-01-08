@@ -1,4 +1,4 @@
-part of '../../pool.dart';
+part of '../pool.dart';
 
 class _OrderedResourceManager<PoolResourceType extends Object>
     extends _ResourceManager<PoolResourceType> {

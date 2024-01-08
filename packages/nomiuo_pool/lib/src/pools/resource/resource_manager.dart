@@ -1,4 +1,4 @@
-part of '../../pool.dart';
+part of '../pool.dart';
 
 abstract class _ResourceManager<PoolResourceType extends Object> {
   _ResourceManager(this._poolMeta,
