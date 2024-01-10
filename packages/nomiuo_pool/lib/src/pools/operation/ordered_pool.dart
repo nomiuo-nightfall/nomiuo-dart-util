@@ -10,63 +10,25 @@ class _OperationPoolImpl<PoolResourceType extends Object>
 
   @override
   Future<ReturnType> operateOnResourceWithTimeout<ReturnType>(
-      OperationOnResource<PoolResourceType, ReturnType> operationOnResource,
-      Duration timeout) async {
-    final DateTime startWaitTime = DateTime.now();
-    final Completer<ReturnType> completer = Completer<ReturnType>();
-
-    Timer.periodic(const Duration(milliseconds: 100), (Timer timer) async {
-      try {
-        final ReturnType result =
-            await _tryHandleWithinAvailableResources(operationOnResource);
-        timer.cancel();
-        completer.complete(result);
-      } on GetResourceFromPoolFailed {
-        if (timeout == Duration.zero) {
-          return;
-        }
-
-        if (DateTime.now().difference(startWaitTime) > timeout) {
-          timer.cancel();
-          completer.completeError(const GetResourceFromPoolTimeout(
-              'Failed to get resource from pool: The pool has no '
-              'resource available and the timeout is reached.'));
-        }
-      } on CreateResourceFailed catch (e) {
-        timer.cancel();
-        completer.completeError(e);
-      }
-    });
-
-    return completer.future;
-  }
+          OperationOnResource<PoolResourceType, ReturnType> operationOnResource,
+          Duration timeout) async =>
+      _tryHandleWithinAvailableResources(operationOnResource, timeout: timeout);
 
   @override
-  Future<ReturnType> operateOnResourceWithoutTimeout<ReturnType>(
+  Future<ReturnType> operateOnResource<ReturnType>(
           OperationOnResource<PoolResourceType, ReturnType>
               operationOnResource) async =>
       _tryHandleWithinAvailableResources(operationOnResource);
 
-  /// Throws [GetResourceFromPoolFailed] if the pool has no resource and
+  /// Throws [GetResourceFromPoolTimeout] if the pool has no resource and
   /// space left to create new resource.
   ///
   /// Throws [CreateResourceFailed] if failed to create new resource.
   Future<ReturnType> _tryHandleWithinAvailableResources<ReturnType>(
-      OperationOnResource<PoolResourceType, ReturnType>
-          operationOnResource) async {
-    try {
-      return await _tryBorrowFromFreeResourceAndHandle(operationOnResource);
-    } on GetResourceFromPoolFailed {
-      return _tryCreateAndHandle(operationOnResource);
-    }
-  }
-
-  Future<ReturnType> _tryCreateAndHandle<ReturnType>(
-      OperationOnResource<PoolResourceType, ReturnType>
-          operationOnResource) async {
+      OperationOnResource<PoolResourceType, ReturnType> operationOnResource,
+      {Duration? timeout}) async {
     final _PoolObject<PoolResourceType> poolObject =
-        await _resourceManager.createNewResource();
-
+        await _resourceManager.borrowAvailableResource(timeout: timeout);
     return _handleWithinResourcePool(poolObject, operationOnResource);
   }
 
@@ -84,15 +46,6 @@ class _OperationPoolImpl<PoolResourceType extends Object>
     await _resourceManager.addFreeResource(poolObject);
 
     return result;
-  }
-
-  Future<ReturnType> _tryBorrowFromFreeResourceAndHandle<ReturnType>(
-      OperationOnResource<PoolResourceType, ReturnType>
-          operationOnResource) async {
-    final _PoolObject<PoolResourceType> poolObject =
-        await _resourceManager.borrowAvailableResource();
-
-    return _handleWithinResourcePool(poolObject, operationOnResource);
   }
 
   Future<ReturnType> _handle<ReturnType>(

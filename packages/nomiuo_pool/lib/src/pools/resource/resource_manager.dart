@@ -28,14 +28,16 @@ abstract class _ResourceManager<PoolResourceType extends Object> {
   /// Throw [CreateResourceFailed] if failed to create new resource.
   Future<void> _initResources();
 
-  /// Create a new resource in the pool and tag it as used. If failed to
-  /// create a new resource, throw [CreateResourceFailed]. If the pool is full,
-  /// throw [GetResourceFromPoolFailed].
-  Future<_PoolObject<PoolResourceType>> createNewResource();
-
-  /// Borrow a free resource from the pool and tag it as used. If the pool has
-  /// no resource available, then throw [GetResourceFromPoolFailed].
-  Future<_PoolObject<PoolResourceType>> borrowAvailableResource();
+  /// Borrow a free resource from the pool and tag it as used.
+  ///
+  /// If the pool has no free resource, try to create new resource. If failed
+  /// to create new resource, throw [CreateResourceFailed].
+  ///
+  /// If the pool has no resource available, no space left and timeout is set,
+  /// then throw [GetResourceFromPoolTimeout]. Otherwise, it will wait util
+  /// the resource is available.
+  Future<_PoolObject<PoolResourceType>> borrowAvailableResource(
+      {Duration? timeout});
 
   /// Delete the resource from the used list and tag it as free.
   Future<void> freeUsedResource(_PoolObject<PoolResourceType> resource);

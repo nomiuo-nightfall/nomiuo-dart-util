@@ -119,6 +119,20 @@ void main() {
       }));
       await notifier.notify(observer, obj: 'value');
     });
+
+    test('Have an observer.', () async {
+      final Notifier notifier = Notifier();
+      final Observer observer = Observer();
+      unawaited(observer.wait(notifier, callback: (Object? obj) {
+        expect(obj, 'value');
+      }));
+      expect(true, notifier.hasObservers);
+      await notifier.notify(observer, obj: 'value');
+
+      await Future<void>.delayed(const Duration(milliseconds: 50), () {
+        expect(false, notifier.hasObservers);
+      });
+    });
   });
 
   group('Invalid operation.', () {

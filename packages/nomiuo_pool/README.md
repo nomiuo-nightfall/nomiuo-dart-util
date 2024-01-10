@@ -25,10 +25,9 @@ void main() async {
   // Borrow a resource from the pool and multiply it by 10.
   // If there is no resource available, try to create a new one. Throw
   // [CreateResourceFailed] if failed to create a new resource.
-  // If the maximum size is reached, then throw an exception
-  // [GetResourceFromPoolFailed].
+  // Or wait util the resource is available.
   // ignore: unused_local_variable
-  final int multiplied10 = await orderedPool.operateOnResourceWithoutTimeout(
+  final int multiplied10 = await orderedPool.operateOnResource(
       (PoolResource<int> poolResource) => poolResource.resource * 10);
 
   // Borrow a resource from the pool and multiply it by 10, but with a timeout.

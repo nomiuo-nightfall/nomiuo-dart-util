@@ -7,7 +7,7 @@ abstract interface class OperationPool<PoolResourceType extends Object> {
       createOrderedPool<PoolResourceType extends Object>(PoolMeta poolMeta,
           {required FutureOr<PoolResource<PoolResourceType>> Function()
               poolObjectFactory}) async {
-    final OperationPool<PoolResourceType> pool =
+    final _OperationPoolImpl<PoolResourceType> pool =
         _OperationPoolImpl<PoolResourceType>();
 
     final _ResourceManager<PoolResourceType> resourceManager =
@@ -20,12 +20,10 @@ abstract interface class OperationPool<PoolResourceType extends Object> {
     return pool;
   }
 
-  late final _ResourceManager<PoolResourceType> _resourceManager;
-
   /// All resources count in the pool.
-  Future<int> allPoolResources() => _resourceManager.allPoolResources();
+  Future<int> allPoolResources();
 
-  /// Like the [operateOnResourceWithoutTimeout], but with a timeout. It will
+  /// Like the [operateOnResource], but with a timeout. It will
   /// wait until the resource is borrowed or the timeout is reached. Note
   /// that the zero duration timeout means wait forever.
   ///
@@ -39,12 +37,12 @@ abstract interface class OperationPool<PoolResourceType extends Object> {
 
   /// Try to borrow a resource from the pool. If the pool has no resource
   /// available, try to create a new one. If the pool is full, then throw an
-  /// exception [GetResourceFromPoolFailed].
+  /// exception [_GetResourceFromPoolFailed].
   ///
   /// Throw [CreateResourceFailed] if failed to create a new resource.
   ///
   /// Notice that it will not catch any exception thrown by the
   /// [PoolResource.onRelease] or [PoolResource.onReset] method, simply rethrow.
-  Future<ReturnType> operateOnResourceWithoutTimeout<ReturnType>(
+  Future<ReturnType> operateOnResource<ReturnType>(
       OperationOnResource<PoolResourceType, ReturnType> operationOnResource);
 }

@@ -17,6 +17,8 @@ abstract class Notifier {
   /// throw [NoSuchObserver].
   Future<void> notify(Observer observer, {Object? obj});
 
+  bool get hasObservers;
+
   Future<void> _addObserver(Observer observer);
 
   Future<void> _removeObserver(Observer observer);
@@ -62,4 +64,7 @@ class _Notifier implements Notifier {
   Future<void> _removeObserver(Observer observer) async {
     _observers.remove(observer);
   }
+
+  @override
+  bool get hasObservers => _observers.isNotEmpty;
 }

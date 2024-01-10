@@ -1,5 +1,5 @@
 name: nomiuo_pool
-version: 0.2.0-dev.4
+version: 0.2.0-dev.5
 description: |
   Manage resource with a pool, which provides a way to execute tasks with a 
   limited number of resources, with optional timeout, and return the 
