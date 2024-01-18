@@ -1,17 +1,30 @@
-part of '../pool.dart';
+import 'dart:async';
+import 'dart:collection';
 
-abstract class _ResourceManager<PoolResourceType extends Object> {
-  _ResourceManager(this._poolMeta,
+import 'package:synchronized/synchronized.dart';
+
+import '../../block/block.dart';
+import '../../model/exceptions/_inner_exceptions.dart';
+import '../../model/exceptions/block_exceptions.dart';
+import '../../model/exceptions/pool_exceptions.dart';
+import '../../model/pool_base_model/_pool_object.dart';
+import '../../model/pool_base_model/pool_meta.dart';
+import '../../model/pool_base_model/pool_resource.dart';
+
+part '__ordered_resource_manager.dart';
+
+abstract class ResourceManager<PoolResourceType extends Object> {
+  ResourceManager(this._poolMeta,
       {required FutureOr<PoolResource<PoolResourceType>> Function()
           poolObjectFactory})
       : _poolObjectFactory = poolObjectFactory;
 
-  static Future<_ResourceManager<PoolResourceType>>
+  static Future<ResourceManager<PoolResourceType>>
       createOrderedResourceManager<PoolResourceType extends Object>(
           PoolMeta poolMeta,
           {required FutureOr<PoolResource<PoolResourceType>> Function()
               poolObjectFactory}) async {
-    final _ResourceManager<PoolResourceType> _orderedResourceManager =
+    final ResourceManager<PoolResourceType> _orderedResourceManager =
         _OrderedResourceManager<PoolResourceType>(poolMeta,
             poolObjectFactory: poolObjectFactory);
     await _orderedResourceManager._initResources();
@@ -36,14 +49,14 @@ abstract class _ResourceManager<PoolResourceType extends Object> {
   /// If the pool has no resource available, no space left and timeout is set,
   /// then throw [GetResourceFromPoolTimeout]. Otherwise, it will wait util
   /// the resource is available.
-  Future<_PoolObject<PoolResourceType>> borrowAvailableResource(
+  Future<PoolObject<PoolResourceType>> borrowAvailableResource(
       {Duration? timeout});
 
   /// Delete the resource from the used list and tag it as free.
-  Future<void> freeUsedResource(_PoolObject<PoolResourceType> resource);
+  Future<void> freeUsedResource(PoolObject<PoolResourceType> resource);
 
   /// Add a resource to the free list.
-  Future<void> addFreeResource(_PoolObject<PoolResourceType> resource);
+  Future<void> addFreeResource(PoolObject<PoolResourceType> resource);
 
   /// All resources in the pool.
   Future<int> allPoolResources();

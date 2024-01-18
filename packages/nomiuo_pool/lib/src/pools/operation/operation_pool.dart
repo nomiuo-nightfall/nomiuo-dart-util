@@ -1,4 +1,13 @@
-part of '../pool.dart';
+import 'dart:async';
+
+import '../../model/exceptions/pool_exceptions.dart';
+import '../../model/pool_base_model/_pool_object.dart';
+import '../../model/pool_base_model/pool_meta.dart';
+import '../../model/pool_base_model/pool_operation_type.dart';
+import '../../model/pool_base_model/pool_resource.dart';
+import '../resource/resource_manager.dart';
+
+part '__ordered_pool.dart';
 
 abstract interface class OperationPool<PoolResourceType extends Object> {
   /// Create a pool with ordered resources.
@@ -10,8 +19,8 @@ abstract interface class OperationPool<PoolResourceType extends Object> {
     final _OperationPoolImpl<PoolResourceType> pool =
         _OperationPoolImpl<PoolResourceType>();
 
-    final _ResourceManager<PoolResourceType> resourceManager =
-        await _ResourceManager.createOrderedResourceManager(
+    final ResourceManager<PoolResourceType> resourceManager =
+        await ResourceManager.createOrderedResourceManager(
       poolMeta,
       poolObjectFactory: poolObjectFactory,
     );
@@ -37,7 +46,7 @@ abstract interface class OperationPool<PoolResourceType extends Object> {
 
   /// Try to borrow a resource from the pool. If the pool has no resource
   /// available, try to create a new one. If the pool is full, then throw an
-  /// exception [_GetResourceFromPoolFailed].
+  /// exception [GetResourceFromPoolFailed].
   ///
   /// Throw [CreateResourceFailed] if failed to create a new resource.
   ///

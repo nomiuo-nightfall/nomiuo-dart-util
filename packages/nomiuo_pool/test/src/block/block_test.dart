@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:nomiuo_pool/nomiuo_pool.dart';
+import 'package:nomiuo_pool/nomiuo_pool_model.dart';
 import 'package:nomiuo_pool/src/block/block.dart';
 @Timeout(Duration(seconds: 10))
 import 'package:test/test.dart';

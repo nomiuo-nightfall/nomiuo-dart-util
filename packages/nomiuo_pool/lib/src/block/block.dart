@@ -3,5 +3,5 @@ import 'dart:math';
 
 import '../model/exceptions/block_exceptions.dart';
 
-part '_notifier.dart';
-part '_observer.dart';
+part '__notifier.dart';
+part '__observer.dart';

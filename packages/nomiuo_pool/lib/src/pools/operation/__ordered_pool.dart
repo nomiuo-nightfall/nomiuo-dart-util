@@ -1,9 +1,8 @@
-part of '../pool.dart';
+part of 'operation_pool.dart';
 
 class _OperationPoolImpl<PoolResourceType extends Object>
     implements OperationPool<PoolResourceType> {
-  @override
-  late final _ResourceManager<PoolResourceType> _resourceManager;
+  late final ResourceManager<PoolResourceType> _resourceManager;
 
   @override
   Future<int> allPoolResources() => _resourceManager.allPoolResources();
@@ -27,13 +26,13 @@ class _OperationPoolImpl<PoolResourceType extends Object>
   Future<ReturnType> _tryHandleWithinAvailableResources<ReturnType>(
       OperationOnResource<PoolResourceType, ReturnType> operationOnResource,
       {Duration? timeout}) async {
-    final _PoolObject<PoolResourceType> poolObject =
+    final PoolObject<PoolResourceType> poolObject =
         await _resourceManager.borrowAvailableResource(timeout: timeout);
     return _handleWithinResourcePool(poolObject, operationOnResource);
   }
 
   Future<ReturnType> _handleWithinResourcePool<ReturnType>(
-      _PoolObject<PoolResourceType> poolObject,
+      PoolObject<PoolResourceType> poolObject,
       OperationOnResource<PoolResourceType, ReturnType>
           operationOnResource) async {
     final ReturnType result;
@@ -49,7 +48,7 @@ class _OperationPoolImpl<PoolResourceType extends Object>
   }
 
   Future<ReturnType> _handle<ReturnType>(
-      _PoolObject<PoolResourceType> poolObject,
+      PoolObject<PoolResourceType> poolObject,
       OperationOnResource<PoolResourceType, ReturnType>
           operationOnResource) async {
     final ReturnType result;

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:nomiuo_pool/util.dart';
+import 'package:nomiuo_pool/nomiuo_pool_util.dart';
 
 Future<void> main() async {
   final Notifier notifier = Notifier();

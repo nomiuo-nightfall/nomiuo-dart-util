@@ -1,35 +1,35 @@
-part of '../pool.dart';
+part of 'resource_manager.dart';
 
 class _OrderedResourceManager<PoolResourceType extends Object>
-    extends _ResourceManager<PoolResourceType> {
+    extends ResourceManager<PoolResourceType> {
   _OrderedResourceManager(super.poolMeta, {required super.poolObjectFactory});
 
-  final Queue<_PoolObject<PoolResourceType>> _freeResources =
-      ListQueue<_PoolObject<PoolResourceType>>();
+  final Queue<PoolObject<PoolResourceType>> _freeResources =
+      ListQueue<PoolObject<PoolResourceType>>();
 
-  final Set<_PoolObject<PoolResourceType>> _inUseResources =
-      <_PoolObject<PoolResourceType>>{};
+  final Set<PoolObject<PoolResourceType>> _inUseResources =
+      <PoolObject<PoolResourceType>>{};
 
   final Notifier _resourceNotifier = Notifier();
 
   final Lock _resourceLock = Lock();
 
   @override
-  Future<_PoolObject<PoolResourceType>> borrowAvailableResource(
+  Future<PoolObject<PoolResourceType>> borrowAvailableResource(
       {Duration? timeout}) async {
     try {
       return await _tryToBorrow();
-    } on _GetResourceFromPoolFailed {
+    } on GetResourceFromPoolFailed {
       try {
         return await _tryToCreate();
-      } on _GetResourceFromPoolFailed {
+      } on GetResourceFromPoolFailed {
         return _waitForResource(timeout);
       }
     }
   }
 
   @override
-  Future<void> addFreeResource(_PoolObject<PoolResourceType> resource) =>
+  Future<void> addFreeResource(PoolObject<PoolResourceType> resource) =>
       _resourceLock.synchronized(() {
         _freeResources.add(resource);
 
@@ -41,7 +41,7 @@ class _OrderedResourceManager<PoolResourceType extends Object>
       });
 
   @override
-  Future<void> freeUsedResource(_PoolObject<PoolResourceType> resource) =>
+  Future<void> freeUsedResource(PoolObject<PoolResourceType> resource) =>
       _resourceLock.synchronized(() {
         _inUseResources.remove(resource);
       });
@@ -50,10 +50,10 @@ class _OrderedResourceManager<PoolResourceType extends Object>
   Future<int> allPoolResources() =>
       Future<int>.value(_freeResources.length + _inUseResources.length);
 
-  Future<_PoolObject<PoolResourceType>> _waitForResource(
+  Future<PoolObject<PoolResourceType>> _waitForResource(
       Duration? timeout) async {
-    final Completer<_PoolObject<PoolResourceType>> completer =
-        Completer<_PoolObject<PoolResourceType>>();
+    final Completer<PoolObject<PoolResourceType>> completer =
+        Completer<PoolObject<PoolResourceType>>();
     await _blockUtilTimeoutOrResourceAvailable(timeout, completer);
     return completer.future;
   }
@@ -63,34 +63,34 @@ class _OrderedResourceManager<PoolResourceType extends Object>
     for (int i = 0; i < _poolMeta.minSize; i++) {
       try {
         _freeResources
-            .add(_PoolObject<PoolResourceType>(await _poolObjectFactory()));
+            .add(PoolObject<PoolResourceType>(await _poolObjectFactory()));
       } on Object catch (e) {
         throw CreateResourceFailed('Failed to create new resource: $e');
       }
     }
   }
 
-  Future<_PoolObject<PoolResourceType>> _tryToBorrow() async =>
+  Future<PoolObject<PoolResourceType>> _tryToBorrow() async =>
       _resourceLock.synchronized(() {
         if (_freeResources.isNotEmpty) {
-          final _PoolObject<PoolResourceType> poolObject =
+          final PoolObject<PoolResourceType> poolObject =
               _freeResources.removeFirst();
           _inUseResources.add(poolObject);
           return poolObject;
         }
 
-        throw const _GetResourceFromPoolFailed('The pool has no free resource '
+        throw const GetResourceFromPoolFailed('The pool has no free resource '
             'now.');
       });
 
   Future<void> _blockUtilTimeoutOrResourceAvailable(Duration? timeout,
-      Completer<_PoolObject<PoolResourceType>> completer) async {
+      Completer<PoolObject<PoolResourceType>> completer) async {
     final Observer observer = Observer();
 
     await observer.wait(_resourceNotifier, timeout: timeout,
         callback: (Object? resource) {
-      final _PoolObject<PoolResourceType> freePoolObject =
-          resource! as _PoolObject<PoolResourceType>;
+      final PoolObject<PoolResourceType> freePoolObject =
+          resource! as PoolObject<PoolResourceType>;
       completer.complete(freePoolObject);
     }).catchError((Object error) {
       if (error is WaitForNotifierTimeout) {
@@ -101,19 +101,19 @@ class _OrderedResourceManager<PoolResourceType extends Object>
     });
   }
 
-  Future<_PoolObject<PoolResourceType>> _tryToCreate() =>
+  Future<PoolObject<PoolResourceType>> _tryToCreate() =>
       _resourceLock.synchronized(() async {
         if (await allPoolResources() < _poolMeta.maxSize) {
           try {
-            final _PoolObject<PoolResourceType> poolObject =
-                _PoolObject<PoolResourceType>(await _poolObjectFactory());
+            final PoolObject<PoolResourceType> poolObject =
+                PoolObject<PoolResourceType>(await _poolObjectFactory());
             _inUseResources.add(poolObject);
             return poolObject;
           } on Object catch (e) {
             throw CreateResourceFailed('Failed to create new resource: $e');
           }
         }
-        throw const _GetResourceFromPoolFailed(
+        throw const GetResourceFromPoolFailed(
             'Failed to get resource from pool: The pool has no resource '
             'available and the left space is too small to create new '
             'resource.');

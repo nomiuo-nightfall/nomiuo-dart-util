@@ -1,4 +1,5 @@
 import 'package:nomiuo_pool/nomiuo_pool.dart';
+import 'package:nomiuo_pool/nomiuo_pool_model.dart';
 
 /// Create your resource here.
 class CustomResource extends PoolResource<int> {
