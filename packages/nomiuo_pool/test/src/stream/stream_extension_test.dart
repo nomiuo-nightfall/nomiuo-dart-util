@@ -72,4 +72,19 @@ void main() {
     });
     await catchError;
   });
+
+  test('Receive port receives specific data', () async {
+    final ReceivePort receivePort = ReceivePort();
+    final Future<void> future = receivePort
+        .firstWhereWithTimeout((Object? element) => element == 'test',
+            timeout: const Duration(milliseconds: 100),
+            onTimeout: () => fail('Receive port should not timeout.'))
+        .then((Object? value) {
+      expect(value, 'test');
+    });
+
+    receivePort.sendPort.send('test');
+    receivePort.sendPort.send('test2');
+    await future;
+  });
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import '../../model/exceptions/_inner_exceptions.dart';
 import '../../model/exceptions/pool_exceptions.dart';
 import '../../model/pool_base_model/_pool_object.dart';
 import '../../model/pool_base_model/pool_meta.dart';

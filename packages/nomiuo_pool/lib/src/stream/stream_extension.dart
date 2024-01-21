@@ -4,14 +4,21 @@ import '../model/exceptions/stream_exceptions.dart';
 
 extension ReceivePortExtension on Stream<Object?> {
   Future<Object?> firstWithTimeout(Duration timeout,
-      {void Function()? onTimeout}) async {
+          {void Function()? onTimeout}) async =>
+      firstWhereWithTimeout((Object? element) => true,
+          timeout: timeout, onTimeout: onTimeout);
+
+  Future<Object?> firstWhereWithTimeout(bool Function(Object?) test,
+      {required Duration timeout, void Function()? onTimeout}) {
     final Completer<Object?> completer = Completer<Object?>();
 
     final StreamSubscription<Object?> subscription = listen(null);
     subscription
       ..onData((Object? value) {
-        subscription.cancel();
-        completer.complete(value);
+        if (test(value)) {
+          subscription.cancel();
+          completer.complete(value);
+        }
       })
       ..onError((Object error) {
         subscription.cancel();
