@@ -60,4 +60,6 @@ abstract class ResourceManager<PoolResourceType extends Object> {
 
   /// All resources in the pool.
   Future<int> allPoolResources();
+
+  Iterable<PoolResourceType> getAllPoolResources();
 }

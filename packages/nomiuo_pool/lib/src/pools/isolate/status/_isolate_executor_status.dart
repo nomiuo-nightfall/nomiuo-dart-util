@@ -5,9 +5,9 @@ import '../../../../nomiuo_pool_util.dart';
 import '../../../model/exceptions/isolate_exceptions.dart';
 import '../executor/_isolate_executor_impl.dart';
 import '../executor/isolate_executor.dart';
+import '../messages/_controller_message.dart';
+import '../messages/_result_message.dart';
 import '../messages/cancellable_controller.dart';
-import '../messages/controller_message.dart';
-import '../messages/result_message.dart';
 
 part '__closed_status.dart';
 part '__idle_status.dart';

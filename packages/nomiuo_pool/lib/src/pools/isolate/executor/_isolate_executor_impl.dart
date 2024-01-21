@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:isolate';
 
+import '../messages/_controller_message.dart';
+import '../messages/_result_message.dart';
 import '../messages/cancellable_controller.dart';
-import '../messages/controller_message.dart';
-import '../messages/result_message.dart';
 import '../status/_isolate_executor_status.dart';
 import 'isolate_executor.dart';
 

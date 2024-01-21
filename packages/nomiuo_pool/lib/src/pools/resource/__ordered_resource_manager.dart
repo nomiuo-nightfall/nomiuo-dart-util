@@ -1,4 +1,4 @@
-part of 'resource_manager.dart';
+part of '_resource_manager.dart';
 
 class _OrderedResourceManager<PoolResourceType extends Object>
     extends ResourceManager<PoolResourceType> {
@@ -118,4 +118,16 @@ class _OrderedResourceManager<PoolResourceType extends Object>
             'available and the left space is too small to create new '
             'resource.');
       });
+
+  @override
+  Iterable<PoolResourceType> getAllPoolResources() {
+    final List<PoolResourceType> allPoolResources = <PoolResourceType>[];
+    for (final PoolObject<PoolResourceType> poolObject in _freeResources) {
+      allPoolResources.add(poolObject.resource.resource);
+    }
+    for (final PoolObject<PoolResourceType> poolObject in _inUseResources) {
+      allPoolResources.add(poolObject.resource.resource);
+    }
+    return allPoolResources;
+  }
 }

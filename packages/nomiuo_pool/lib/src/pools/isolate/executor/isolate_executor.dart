@@ -4,6 +4,7 @@ import '../../../model/exceptions/isolate_exceptions.dart';
 import '../messages/cancellable_controller.dart';
 import '_isolate_executor_impl.dart';
 
+/// Execute the task in the isolate.
 abstract class IsolateExecutor {
   static Future<IsolateExecutor> create() async => createIsolateExecutor();
 

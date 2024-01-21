@@ -3,6 +3,15 @@ import 'dart:async';
 import '../../../model/exceptions/isolate_exceptions.dart';
 import '../executor/isolate_executor.dart';
 
+/// A controller for the result of a task. For example:
+///
+/// ```dart
+/// final CancellableController<int> cancellableController =
+///           isolateExecutor.execute(() => 1);
+/// await cancellableController.future.then((int value) {
+///    expect(value, 1);
+///  });
+/// ```
 class CancellableController<T> {
   CancellableController(this.result, {required IsolateExecutor isolateExecutor})
       : _executor = isolateExecutor;

@@ -6,7 +6,7 @@ import '../../model/pool_base_model/_pool_object.dart';
 import '../../model/pool_base_model/pool_meta.dart';
 import '../../model/pool_base_model/pool_operation_type.dart';
 import '../../model/pool_base_model/pool_resource.dart';
-import '../resource/resource_manager.dart';
+import '../resource/_resource_manager.dart';
 
 part '__ordered_pool.dart';
 
